@@ -1,32 +1,40 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <!-- Mobile device support -->
         <meta name="viewport" content="width=device-width, maximum-scale=1, initial-scale=1, user-scalable=0" />
         <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="apple-touch-icon" href="/images/logomobile.png">
+
         <title>NightScout</title>
+
+        <!-- favicon -->
         <link href="/images/round1.png" rel="icon" id="favicon" type="image/png" />
-        <link rel="stylesheet" type="text/css" href="/css/main.css?v=0.5.1" />
-        <link rel="stylesheet" type="text/css" href="/css/dropdown.css" />
-        <link rel="stylesheet" type="text/css" href="/css/drawer.css?v=0.5.1" />
-        <link rel="stylesheet" type="text/css" href="/bower_components/tipsy-jmalonzo/src/stylesheets/tipsy.css" />
+
+        <!-- stylesheets -->
+        <link rel="stylesheet" type="text/css" href="/css/styles.css">
+        <link rel="stylesheet" type="text/css" href="/glyphs/css/fontello.css">
+
+        <!-- bower scripts -->
         <script src="/socket.io/socket.io.js"></script>
-        <script src="/api/v1/status.js"></script>
         <script src="/bower_components/d3/d3.min.js"></script>
         <script src="/bower_components/jquery/dist/jquery.min.js"></script>
         <script src="/bower_components/jQuery-Storage-API/jquery.storageapi.min.js"></script>
         <script src="/bower_components/tipsy-jmalonzo/src/javascripts/jquery.tipsy.js"></script>
 
+        <!-- wat -->
+        <script src="/api/v1/status.js"></script>
+
+
+        <!-- require js and less -->
         <script src="/js/require.js" data-main="/js/main.js"></script>
+
+
     </head>
-    <body>
-
-
+    <body class="theme-defualt">
         <div class="audio alarms">
             <audio src="/audio/alarm.mp3" preload="auto" loop="true" class="alarm mp3" type="audio/mp3"></audio>
             <audio src="/audio/alarm2.mp3" preload="auto" loop="true" class="urgent alarm2 mp3" type="audio/mp3"></audio>
         </div>
-
-
     </body>
 </html>

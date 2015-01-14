@@ -1,9 +1,10 @@
-define(['react', 'jsx!components/header', 'chart'], function(React, Header, chart) {
+define(['react', 'jsx!components/header', 'jsx!components/titlebar', 'chart'], function(React, Header, TitleBar, chart) {
     return React.createClass({
         displayName: 'Root',
 
         render: function () {
             return <div className="root">
+                <TitleBar {...this.props}/>
                 <Header ref="header" {...this.props}/>
                 <div className="chart" ref="chart"></div>
             </div>;

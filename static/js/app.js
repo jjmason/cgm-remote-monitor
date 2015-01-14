@@ -1,13 +1,33 @@
-define(['react', 'jsx!components/root'], function(React, Root){
-    var module = {},
-        context = module.context = {};
+define(['react', 'radio', 'jsx!components/root', 'settings', 'socket'], function(React, radio, Root, settings, Socket){
+    var app = {}
 
-    module.create = function(container){
+    var create = function(container){
+        app.container = container;
         React.render(
-            <Root context={context}/>,
+            <Root app={app}/>,
             container
         );
+        return app;
     };
 
-    return module;
+    var currentTheme = 'default';
+
+    app.setTheme = function(theme){
+        if(theme != currentTheme){
+            $(app.container)
+                .removeClass('theme-' + currentTheme)
+                .addClass('theme-' + theme);
+            currentTheme = theme;
+        }
+    };
+
+    radio('settings:change').subscribe(function(settings){
+        app.setTheme(settings.theme());
+    });
+
+    app.setTheme(settings.theme());
+
+    app.socket = new Socket();
+
+    return {create: create};
 });

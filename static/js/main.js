@@ -13,7 +13,22 @@ requirejs.config({
         react: 'vendor/react-with-addons',
         JSXTransformer: 'vendor/JSXTransformer',
         jsx: 'vendor/jsx',
-        text: 'vendor/text'
+        text: 'vendor/text',
+        radio: 'vendor/radio',
+        moment: 'vendor/moment',
+        jquery: 'vendor/jquery',
+        'jquery-storage': 'vendor/jquery.storageapi',
+        'socket.io': '/socket.io/socket.io.js'
+    },
+    shim:{
+        'socket.io': {
+            exports: 'io'
+        }
+    },
+    config: {
+        moment: {
+            noGlobal: true
+        }
     }
 });
 

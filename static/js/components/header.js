@@ -6,7 +6,6 @@ function(React, Clock, Toolbox, Status){
         render: function(){
             return <div className="header">
                 <Clock ref='clock' {...this.props}/>
-
             </div>
         }
     });

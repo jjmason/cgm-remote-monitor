@@ -77,7 +77,7 @@ app.get('/pebble', pebble(entriesStorage, devicestatusStorage));
 
 // define static server
 //TODO: JC - changed cache to 1 hour from 30d ays to bypass cache hell until we have a real solution
-var staticFiles = express.static(env.static_files, {maxAge: 60 * 60 * 1000});
+var staticFiles = express.static(env.static_files);
 
 // serve the static content
 app.use(staticFiles);

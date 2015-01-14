@@ -1,0 +1,78 @@
+@import "variables.less";
+@import "theme.less";
+
+html, body {
+  background-color: @background-color;
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  fill: @background-fill;
+  color: @default-color;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+// mixin for row like things.
+.row {
+   display: block;
+}
+
+// defines the title bar border
+.title-bar-border {
+  border-bottom: 1px solid #999;
+}
+
+// our title bar, the first "row" of the screen
+.title-bar {
+  .row;
+  .title-bar-border;
+  top: 0;
+  padding: 0;
+  margin: 0;
+  background: url(/images/logo2.png) no-repeat 3px 3px #333;
+  height: @title-bar-height;
+
+  .custom-title {
+    display: inline-block;
+    font-size: @font-size-md;
+    margin: 0 0 0 42px;
+    padding: 10px 90px 0 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
+
+.toolbox {
+  display: inline-block;
+  float: right;
+  padding: 10px;
+}
+
+.toolbox-button {
+  text-decoration: none;
+  color: @default-color;
+}
+
+.clock {
+  display: inline-block;
+  margin-top: 10px;
+  width: 250px;
+  text-align: center;
+  .time-current {
+    font-size: @font-size-md * 6;
+  }
+
+  .time-ago {
+    // TODO moar variables needed!
+    font-size: @font-size-md * 6 * .25;
+    background: none repeat scroll 0 0 #999;
+    border-radius: 5px;
+    color: #000;
+    padding: 0.25em;
+    margin-left: 16px;
+
+    &.old {
+      background: none repeat scroll 0 0 #C00 !important;
+    }
+  }
+}
