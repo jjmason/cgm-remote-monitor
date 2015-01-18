@@ -5,66 +5,77 @@ var path        = require('path'),
     changed     = require('gulp-changed'),
     gutil       = require('gulp-util'),
     notifier    = require('node-notifier'),
-    browserify  = require('gulp-browserify'),
-    concat      = require('gulp-concat'),
-    clean       = require('gulp-clean')
+    browserify  = require('browserify'),
+    reactify    = require('reactify'),
+    source      = require('vinyl-source-stream'),
+    del         = require('del')
     ;
 
-var lessBasePath  = 'static/css';
-var lessFiles     = path.join(fs.realpathSync(lessBasePath), '*.less');
-var appScript     = fs.realpathSync('static/js/app.js');
-var buildPath     = fs.realpathSync('static/js/build/');
-var shim          = {
-    react: {
-        path: '/static/js/vendor/react-with-addons.js',
-        exports: 'React'
-    },
-    radio: {
-        path: '/static/js/vendor/radio.js',
-        exports: 'radio'
-    },
-    moment: {
-        path: '/static/js/vendor/moment.js',
-        exports: 'moment'
-    }
+/**
+ * Some paths we use, collected here for maintainance sanity
+ */
+var paths ={
+    js:  ['static/js/*.js', 'static/js/components/*.js'],
+    less: './static/css/*.less',
+    vendor: './static/vendor',
+    cssDest: 'static/build/css',
+    jsDest:  'static/build/js'
 };
 
-gulp.task('clean', function(){
-    return gulp.src([buildPath + "/*.js", path.dirname(lessFiles) + "/*.css"])
-               .pipe(clean());
+/**
+ * Helper to create a vendor path
+ */
+function vendor(name){
+    var ext = path.extname(name).substr(1);
+    return './static/vendor/' + ext + '/' + name;
+}
+
+function requireVendor(bundle,filename, exports){
+    bundle = bundle.require(vendor(filename), {expose:exports});
+    return {
+        bundle: bundle,
+        require:function(filename, exports){
+            return requireVendor(bundle, filename, exports)
+        }
+    };
+}
+
+function requires(bundle){
+    return requireVendor(bundle, 'react-with-addons.js', 'react')
+            .require('radio.js', 'radio')
+            .require('moment.js', 'moment')
+            .require('store.js', 'store').bundle;
+}
+
+
+
+
+gulp.task('clean', function(done){
+    del('static/build', done);
 });
 
-gulp.task('scripts', function(){
-    return gulp.src(appScript)
-        .pipe(browserify({
-            shim: shim,
-            debug: !gulp.env.production,
-            insertGlobals: true
-        }))
-        .pipe(concat('app.js'))
-        .pipe(gulp.dest(buildPath));
+gulp.task('js', function(){
+    browserify()
+            .require(vendor('react-with-addons.js'), {expose: 'react'})
+            .require(vendor('radio.js'), {expose: 'radio'})
+            .require(vendor('moment.js'), {expose: 'moment'})
+            .require(vendor('store.js'), {expose: 'store'})
+            .add(__dirname + '/static/js/app.js')
+            .transform(reactify)
+            .bundle()
+            .pipe(source('bundle.js'))
+            .pipe(gulp.dest('./static/build/js/'));
 });
 
 
 gulp.task('less', function () {
-    var cssDestination = path.dirname(lessFiles);
-
-    return gulp
-        .src(lessFiles)
-        .pipe(changed(cssDestination, {extension: '.css'}))
+    gulp.src(paths.less)
+        .pipe(changed(path.dirname(paths.less)))
         .pipe(less())
-        .on('error', function (error) {
-            gutil.log(gutil.colors.red(error.message))
-            // Notify on error. Uses node-notifier
-            notifier.notify({
-                title: 'Less compilation error',
-                message: error.message
-            })
-        })
-        .pipe(gulp.dest(cssDestination));
+        .pipe(gulp.dest('./static/build/css'));
 });
 
-gulp.task('build', ['clean', 'less', 'scripts']);
+gulp.task('build', ['clean', 'less', 'js']);
 
 gulp.task('watch', function(){
    gulp.watch(lessFiles, ['build']);

@@ -7,6 +7,7 @@ my.env
 
 *.env
 static/bower_components/
+static/build
 .*.sw?
 .DS_Store
 
