@@ -885,7 +885,7 @@
             treatments = d[3];
             treatments.forEach(function (d) {
                 d.created_at = new Date(d.created_at);
-            });
+            });s
 
             if (!isInitialData) {
                 isInitialData = true;

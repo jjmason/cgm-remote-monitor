@@ -2,8 +2,11 @@ define(['jquery', 'radio', 'utils', 'jquery-storage'], function($, radio, u){
     var defaultSettings = {
         timeFormat: '12',
         customTitle: 'Nightscout',
-        theme: 'default'
+        theme: 'default',
+        units: 'mgdl'
     };
+
+    var MGDL_TO_MMOL =  u.MGDL_TO_MMOL;
 
     var broadCastScheduled = false;
 
@@ -19,10 +22,14 @@ define(['jquery', 'radio', 'utils', 'jquery-storage'], function($, radio, u){
 
     function Settings(storage){
         this.storage  = storage;
+        this._cache = {};
     }
 
     Settings.prototype = {
         get: function(name, defaultValue){
+            if(u.isDefined(this._cache[name])){
+                return this._cache[name];
+            }
             if(!defaultValue || this.storage.isSet(name)){
                 return this.storage.get(name);
             }
@@ -35,7 +42,11 @@ define(['jquery', 'radio', 'utils', 'jquery-storage'], function($, radio, u){
             if(old != value){
                 this.storage.set(name, value);
                 scheduleBroadcast(this);
+                if(u.isDefined(this._cache[name])){
+                    delete this._cache[name];sz
+                }
             }
+
         },
 
         restoreDefaults: function(){
@@ -46,6 +57,15 @@ define(['jquery', 'radio', 'utils', 'jquery-storage'], function($, radio, u){
                     value = defaultSettings[key];
                     this.set(key, value);
                 }
+            }
+        },
+
+        scaleBg: function(v){
+            var units = this.units();
+            if(units !== 'mgdl'){
+                return MGDL_TO_MMOL * v;
+            }else{
+                return v;
             }
         }
     };

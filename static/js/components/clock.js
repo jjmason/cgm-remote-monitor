@@ -36,12 +36,9 @@ define(['react', 'radio', 'moment', 'data'], function (React, radio, moment, dat
                 this.setState({latest: data.lastUpdatedAt()});
             }, this]);
 
-            // update the clock every five seconds (easy for debugging and testing,
-            // but probably should do this a lot less often in productionn, especially
-            // for mobile.
-            setInterval(function(){
-                this.setState({now: new Date()})
-            }.bind(this), 5000);
+            radio('socket:now').subscribe([function(now){
+                this.setState({now: new Date(now)});
+            }, this]);
         },
 
         getCurrentText: function(){

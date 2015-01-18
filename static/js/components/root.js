@@ -11,8 +11,8 @@ define(['react', 'jsx!components/header', 'jsx!components/titlebar', 'chart'], f
         },
 
         componentDidMount: function () {
-            this.props.context.chart = chart.create(this.refs.chart.getDOMNode());
-            this.props.context.header = this.refs.header.getDOMNode();
+            this.props.app.chart = chart.create(this.refs.chart.getDOMNode());
+            this.props.app.header = this.refs.header.getDOMNode();
         }
     });
 });
