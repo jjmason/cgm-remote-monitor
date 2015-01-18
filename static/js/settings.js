@@ -43,7 +43,7 @@ define(['jquery', 'radio', 'utils', 'jquery-storage'], function($, radio, u){
                 this.storage.set(name, value);
                 scheduleBroadcast(this);
                 if(u.isDefined(this._cache[name])){
-                    delete this._cache[name];sz
+                    delete this._cache[name];
                 }
             }
 

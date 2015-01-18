@@ -21,7 +21,7 @@ define(['react', 'radio', 'jsx!components/toolbox', 'settings'], function(React,
         componentDidMount: function(){
             radio('settings:changed').subscribe(function(settings){
                 this.setState({customTitle: settings.customTitle()});
-            });
+            }.bind(this));
         },
 
         customTitleClass: function(){
