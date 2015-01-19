@@ -1,9 +1,7 @@
-define([], function(){
-    var chart = {};
+var chart = {};
+chart.create = function(container){
+    console.log("creating a chart in " + container);
+    return this;
+};
 
-    chart.create = function(container){
-        console.log("creating chart in " + container);
-    };
-
-    return chart;
-});
+module.exports = chart;

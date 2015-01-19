@@ -1,43 +1,46 @@
-define(['react', 'radio', 'jsx!components/toolbox', 'settings'], function(React, radio, Toolbox, settings){
-    /**
-     * This is the bar that appears at the top of the screen.  It displays
-     * the value of the user's customTitle, and and the toolbox buttons.
-     *
-     * CSS:
-     *  div.title-bar the root element for this component
-     *  span.custom-title the element displaying the custom title
-     *  span.custom-title.visible/hidden - visible and hidden states for the custom
-     *  title.
-     */
-    return React.createClass({
-        displayName: 'Titlebar',
+var React = require('react'),
+    radio = require('radio'),
+    Toolbox = require('./toolbox'),
+    settings = require('../settings');
 
-        getInitialState: function(){
-            return {
-                customTitle: settings.customTitle()
-            };
-        },
+/**
+ * This is the bar that appears at the top of the screen.  It displays
+ * the value of the user's customTitle, and and the toolbox buttons.
+ *
+ * CSS:
+ *  div.title-bar the root element for this component
+ *  span.custom-title the element displaying the custom title
+ *  span.custom-title.visible/hidden - visible and hidden states for the custom
+ *  title.
+ */
+module.exports = React.createClass({
+    displayName: 'Titlebar',
 
-        componentDidMount: function(){
-            radio('settings:changed').subscribe(function(settings){
-                this.setState({customTitle: settings.customTitle()});
-            }.bind(this));
-        },
+    getInitialState: function () {
+        return {
+            customTitle: settings.customTitle()
+        };
+    },
 
-        customTitleClass: function(){
-            if(this.state.customTitle && this.state.customTitle != ''){
-                return 'visible';
-            }else{
-                return 'hidden';
-            }
-        },
+    componentDidMount: function () {
+        radio('settings:changed').subscribe(function (settings) {
+            this.setState({customTitle: settings.customTitle()});
+        }.bind(this));
+    },
 
-
-        render: function(){
-            return <div className='title-bar'>
-                <span className={'custom-title ' + this.customTitleClass()}>{this.state.customTitle}</span>
-                <Toolbox/>
-            </div>;
+    customTitleClass: function () {
+        if (this.state.customTitle && this.state.customTitle != '') {
+            return 'visible';
+        } else {
+            return 'hidden';
         }
-    });
+    },
+
+
+    render: function () {
+        return <div className='title-bar'>
+            <span className={'custom-title ' + this.customTitleClass()}>{this.state.customTitle}</span>
+            <Toolbox/>
+        </div>;
+    }
 });

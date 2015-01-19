@@ -16,10 +16,11 @@ var Root = React.createClass({
 
     componentDidMount: function () {
         this.props.app.chart = chart.create(this.refs.chart.getDOMNode());
-        this.props.app.header = this.refs.header.getDOMNode();
     }
 });
 
 Root.create = function(app, container){
     React.render(<Root app={app}/>, container);
 };
+
+module.exports = Root;

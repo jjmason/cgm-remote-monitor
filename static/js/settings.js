@@ -1,100 +1,122 @@
-define(['jquery', 'radio', 'utils', 'jquery-storage'], function($, radio, u){
-    var defaultSettings = {
-        timeFormat: '12',
-        customTitle: 'Nightscout',
-        theme: 'default',
-        units: 'mgdl'
-    };
+var radio = require('radio'),
+    u = require('./utils'),
+    store = require('store');
 
-    var MGDL_TO_MMOL =  u.MGDL_TO_MMOL;
+var defaultSettings = {
+    timeFormat: '12',
+    customTitle: 'Nightscout',
+    theme: 'default',
+    units: 'mgdl'
+};
 
-    var broadCastScheduled = false;
+var broadCastScheduled = false;
 
-    function scheduleBroadcast(settings){
-        if(!broadCastScheduled){
-            broadCastScheduled = true;
-            u.setImmediate(function(){
-               broadCastScheduled = false;
-                radio('settings:changed').broadcast(settings);
-            });
+function scheduleBroadcast(settings) {
+    if (!broadCastScheduled) {
+        broadCastScheduled = true;
+        u.setImmediate(function () {
+            broadCastScheduled = false;
+            radio('settings:changed').broadcast(settings);
+        });
+    }
+}
+
+function namespace(key) {
+    return 'nightscout-settings:' + key;
+}
+
+function cached(cache, fn) {
+    return function (key, defVal) {
+        if (cache.hasOwnProperty(key)) {
+            return cache[key];
+        } else {
+            return fn(key, defVal);
         }
     }
+}
 
-    function Settings(storage){
-        this.storage  = storage;
-        this._cache = {};
+function nsget(cache, key, defval) {
+    key = namespace(key);
+    if (key in cache && cache[key]) {
+        return cache[key];
     }
+    return store.get(key, defval);
+}
 
-    Settings.prototype = {
-        get: function(name, defaultValue){
-            if(u.isDefined(this._cache[name])){
-                return this._cache[name];
-            }
-            if(!defaultValue || this.storage.isSet(name)){
-                return this.storage.get(name);
-            }
-            this.set(name, defaultValue);
-            return defaultValue;
-        },
+function nsset(cache, key, val) {
+    key = namespace(key);
+    cache[key] = val;
+    store.set(key, val);
+}
 
-        set: function(name, value){
-            var old = this.storage.get(name);
-            if(old != value){
-                this.storage.set(name, value);
-                scheduleBroadcast(this);
-                if(u.isDefined(this._cache[name])){
-                    delete this._cache[name];
-                }
-            }
+function Settings() {
 
-        },
+    var cache = this._cache = {},
+        self = this, k;
 
-        restoreDefaults: function(){
-            var key, value;
-
-            for(key in defaultSettings){
-                if(defaultSettings.hasOwnProperty(key)){
-                    value = defaultSettings[key];
-                    this.set(key, value);
-                }
-            }
-        },
-
-        scaleBg: function(v){
-            var units = this.units();
-            if(units !== 'mgdl'){
-                return MGDL_TO_MMOL * v;
-            }else{
-                return v;
-            }
+    this.set = function (key, value) {
+        var current = self.get(key);
+        if(current !== value){
+            scheduleBroadcast(self);
+        }
+        nsset(cache, key, value);
+    };
+    this.get = function (key, defval) {
+        return nsget(cache, key, defval);
+    };
+    
+    this.restoreDefaults = function () {
+        var key;
+        for (key in defaultSettings) {
+            self.set(key, defaultSettings[key]);
         }
     };
 
-    (function(){
-        var k,v,sp=Settings.prototype,
-            defineGetter = function(key, def){
-                return function(){
-                    return this.get(key, def);
-                }
-            },
-            defineSetter = function(key){
-               return function(value){
-                   this.set(key, value);
-               }
-            },
-            setterName = function(prop){
-                return "set" + u.capitalize(prop);
-            };
-        for(k in defaultSettings){
-            if(defaultSettings.hasOwnProperty(k)){
-                v = defaultSettings[k];
-                sp[k] = defineGetter(k,v);
-                sp[setterName(k)] = defineSetter(k);
-            }
-        }
-    })();
+    function getter(key, def) {
+        return function () {
+            return self.get(key, def);
+        };
+    }
 
-    var settings = new Settings($.localStorage);
-    settings.restoreDefaults();
-    return settings;
-});
+    function setter(key) {
+        return function (value) {
+            self.set(key, value);
+        };
+    }
+
+    function setterName(prop) {
+        return 'set' + u.capitalize(prop);
+    }
+
+    for (k in defaultSettings) {
+        if (defaultSettings.hasOwnProperty(k)) {
+            self[k] = getter(k, defaultSettings[k]);
+            self[setterName(k)] = setter(k);
+        }
+    }
+}
+
+(function () {
+    var k, v, sp = Settings.prototype,
+        defineGetter = function (key, def) {
+            return function () {
+                return this.get(key, def);
+            }
+        },
+        defineSetter = function (key) {
+            return function (value) {
+                this.set(key, value);
+            }
+        },
+        setterName = function (prop) {
+            return "set" + u.capitalize(prop);
+        };
+    for (k in defaultSettings) {
+        if (defaultSettings.hasOwnProperty(k)) {
+            v = defaultSettings[k];
+            sp[k] = defineGetter(k, v);
+            sp[setterName(k)] = defineSetter(k);
+        }
+    }
+})();
+module.exports = new Settings();
